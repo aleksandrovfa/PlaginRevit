@@ -8,7 +8,7 @@ using Autodesk.Revit.UI;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB.Architecture;
 // проба gitcgdf
-// проба git2
+// проба gitcgdf2ыва
 namespace plAginF
 {
     [TransactionAttribute(TransactionMode.Manual)]
