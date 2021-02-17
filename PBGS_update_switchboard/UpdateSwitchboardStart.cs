@@ -20,7 +20,14 @@ namespace PBGS_update_switchboard
             FilteredElementCollector newSheetsFilter = new FilteredElementCollector(doc);
             ICollection<Element> allSheets = newSheetsFilter.OfCategory(BuiltInCategory.OST_Sheets).WhereElementIsNotElementType().ToElements();
 
-            return Result.Succeeded;
+            List<string> allSheetsNames = new List<string>();
+
+            foreach (Element sheetEl in allSheets)
+            {
+                allSheetsNames.Add(sheetEl.Name);
+
+            }
+                return Result.Succeeded;
         }
     }
 }
