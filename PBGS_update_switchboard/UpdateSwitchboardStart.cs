@@ -18,6 +18,7 @@ namespace PBGS_update_switchboard
         {
             Document doc = commandData.Application.ActiveUIDocument.Document;
             FilteredElementCollector newSheetsFilter = new FilteredElementCollector(doc);
+            ICollection<Element> allSheets = newSheetsFilter.OfCategory(BuiltInCategory.OST_Sheets).WhereElementIsNotElementType().ToElements();
 
             return Result.Succeeded;
         }
