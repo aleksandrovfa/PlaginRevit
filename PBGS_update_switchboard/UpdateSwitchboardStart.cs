@@ -29,10 +29,10 @@ namespace PBGS_update_switchboard
                 allSheetsNames.Add(sheet.Title);
                 аllSheetsList.Add(sheet);
             }
-
-
             ViewSheet[] allSheetsArray = аllSheetsList.ToArray();
             Array.Sort(allSheetsArray, new SheetsComparerByNum());
+
+
             Console.WriteLine("dsfjlk");
             //Console.WriteLine(sheets);
             Console.WriteLine("dsfjlk");
