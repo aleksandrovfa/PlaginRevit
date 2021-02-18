@@ -18,16 +18,26 @@ namespace PBGS_update_switchboard
         {
             Document doc = commandData.Application.ActiveUIDocument.Document;
             FilteredElementCollector newSheetsFilter = new FilteredElementCollector(doc);
-            ICollection<Element> allSheets = newSheetsFilter.OfCategory(BuiltInCategory.OST_Sheets).WhereElementIsNotElementType().ToElements();
+            ICollection<Element> allsheets = newSheetsFilter.OfCategory(BuiltInCategory.OST_Sheets).WhereElementIsNotElementType().ToElements(); ;
 
             List<string> allSheetsNames = new List<string>();
+            List<ViewSheet> аllSheetsList = new List<ViewSheet>();
 
-            foreach (Element sheetEl in allSheets)
+            foreach (Element sheetEl in allsheets)
             {
-                allSheetsNames.Add(sheetEl.Name);
-
+                ViewSheet sheet = sheetEl as ViewSheet;
+                allSheetsNames.Add(sheet.Title);
+                аllSheetsList.Add(sheet);
             }
-                return Result.Succeeded;
+
+
+            ViewSheet[] allSheetsArray = аllSheetsList.ToArray();
+            Array.Sort(allSheetsArray, new SheetsComparerByNum());
+            Console.WriteLine("dsfjlk");
+            //Console.WriteLine(sheets);
+            Console.WriteLine("dsfjlk");
+
+            return Result.Succeeded;
         }
     }
 }
