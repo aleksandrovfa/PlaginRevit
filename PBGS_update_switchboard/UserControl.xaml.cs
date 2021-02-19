@@ -12,17 +12,33 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Autodesk.Revit.DB;
 
 namespace PBGS_update_switchboard
 {
     /// <summary>
     /// Логика взаимодействия для UserControl.xaml
     /// </summary>
-    public partial class UserControl : UserControl
+    public partial class UserControl : Window
     {
-        public UserControl()
+        ViewSheet[] allSheets;
+
+        public UserControl(ViewSheet[] allSheetsArray)
         {
             InitializeComponent();
+            allSheets = allSheetsArray;
+            //List<string>checksheet = new List<string>();
+            //CheckBox checksheet = new CheckBox();
+
+
+            foreach (ViewSheet sheet in allSheets)
+            {
+                CheckBox checksheet = new CheckBox();
+                checksheet.Content = (sheet.Title);
+                SheetPanel.Children.Add(checksheet);
+            }
+           
+
         }
     }
 }

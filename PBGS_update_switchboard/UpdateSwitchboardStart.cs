@@ -32,10 +32,12 @@ namespace PBGS_update_switchboard
             ViewSheet[] allSheetsArray = аllSheetsList.ToArray();
             Array.Sort(allSheetsArray, new SheetsComparerByNum());
 
+            UserControl userControl = new UserControl(allSheetsArray);
 
-            Console.WriteLine("dsfjlk");
+            userControl.ShowDialog();
+            //Console.WriteLine("dsfjlk");
             //Console.WriteLine(sheets);
-            Console.WriteLine("dsfjlk");
+            //Console.WriteLine("dsfjlk");
 
             return Result.Succeeded;
         }

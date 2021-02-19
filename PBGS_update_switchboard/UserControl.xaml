@@ -14,12 +14,17 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition Height="286*"/>
-            <RowDefinition Height="40*"/>
+            <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1">
         <StackPanel x:Name="SheetPanel"
-            HorizontalAlignment="Stretch" 
+                    HorizontalAlignment="Stretch" 
                     VerticalAlignment="Stretch" 
-                    Margin="5" Grid.Row="1"/>
-
+                    Margin="5" 
+                    ScrollViewer.VerticalScrollBarVisibility="Visible"
+                    />
+        </ScrollViewer>
+        <Button Content="Button" HorizontalAlignment="Left" Margin="137,10,0,0" Grid.Row="2" VerticalAlignment="Top" Width="75"/>
+          
     </Grid>
 </Window>
