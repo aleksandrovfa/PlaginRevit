@@ -24,11 +24,13 @@ namespace plAginF
     {
         List<Level> allLevels;
         Room[] allRooms;
-        public LevelViewWind(List<Level> levels, Room[] rooms)
+        Document _doc;
+        public LevelViewWind(List<Level> levels, Room[] rooms, Document doc)
         {
             InitializeComponent();
             allRooms = rooms;
             allLevels = levels;
+            _doc = doc;
 
             foreach(Level level in allLevels)
             {
@@ -43,6 +45,33 @@ namespace plAginF
         private void Start_Click(object sender, RoutedEventArgs e)
         {
             double startValue = Convert.ToDouble(StartNumberValueView.Text);
+            UIElementCollection comboBoxes = AllLevelsView.Children;
+
+            //ComboBox comboBox = comboBoxes[0] as ComboBox;
+            List<String> allCheckedLevels = new List<string>();
+            foreach (UIElement element in comboBoxes)
+            {
+                CheckBox checkBox = element as CheckBox;
+                //if ()
+                if (checkBox.IsChecked == true)
+                    allCheckedLevels.Add(checkBox.Content.ToString());
+            }
+            using(Transaction t = new Transaction(_doc))
+            {
+                t.Start("SetNumber");
+            for(int i = 0; i<allRooms.Count(); i++)
+            {
+                Room room = allRooms[i];
+                string roomLevelName = room.Level.Name;
+                if (allCheckedLevels.Contains(roomLevelName))
+                    {
+                        double newNumber = startValue + i;
+                        room.get_Parameter(BuiltInParameter.ROOM_NUMBER).Set(newNumber.ToString());
+                    }
+            }
+                t.Commit();
+
+            }
         }
     }
 }

@@ -41,7 +41,7 @@ namespace plAginF
             Room[] allRoomsArray = allRoomsList.ToArray();
             Array.Sort(allRoomsArray, new RoomComparerByNum());
 
-            UserWindRoom userWind = new UserWindRoom(allRoomsArray, allRoomLevel);
+            UserWindRoom userWind = new UserWindRoom(allRoomsArray, allRoomLevel, doc);
 
             userWind.ShowDialog();
             return Result.Succeeded;

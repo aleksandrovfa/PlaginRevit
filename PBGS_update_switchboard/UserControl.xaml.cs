@@ -28,7 +28,6 @@ namespace PBGS_update_switchboard
         {
             InitializeComponent();
             allSheets = allSheetsArray;
-
             foreach (ViewSheet sheet in allSheets)
             {
                 CheckBox checksheet = new CheckBox();
@@ -37,15 +36,16 @@ namespace PBGS_update_switchboard
             }
 
             аllViewDrawting = аllViewDrawtingArray;
-
             foreach (View view in аllViewDrawting)
             {
                 CheckBox checkview = new CheckBox();
                 checkview.Content = (view.Name);
                 ViewPanel.Children.Add(checkview);
-
-
             }
+        }
+        private void Update(Object sender, EventArgs e)
+        {
+            MessageBox.Show("Всё работает");
         }
     }
 }

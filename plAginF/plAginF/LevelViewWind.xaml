@@ -9,19 +9,21 @@
              d:DesignHeight="200" d:DesignWidth="200">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="20px"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="50px"/>
         </Grid.RowDefinitions>
         <StackPanel x:Name="AllLevelsView" 
+                    Grid.Row="1"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch">
         
+        </StackPanel>
         <TextBox x:Name="StartNumberValueView"
             Grid.Row="0" Text="0"/>
-        </StackPanel>
         
         
-        <Button Content="Начать" Grid.Row="1"
+        <Button Content="Начать" Grid.Row="2"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Click="Start_Click"/>

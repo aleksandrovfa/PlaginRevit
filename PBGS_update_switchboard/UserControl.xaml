@@ -19,7 +19,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="286*"/>
-            <RowDefinition Height="40"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <TextBlock Text="Листы:" 
                    Grid.Column="0" 
@@ -30,7 +30,7 @@
         <TextBlock Text="Выберите листы с созданными аннотациями" 
                    Grid.Column="0" 
                    Grid.Row="0"/>
-        <TextBlock Text="Выберите вид на котором необходимов обновить аннотации" 
+        <TextBlock Text="Выберите вид на котором необходимо обновить аннотации" 
                    Grid.Column="1" 
                    Grid.Row="0"/>
 
@@ -45,7 +45,13 @@
                     ScrollViewer.VerticalScrollBarVisibility="Visible"
                     />
         </ScrollViewer>
-        <Button Content="Button" HorizontalAlignment="Left" Margin="137,10,0,0" Grid.Row="3" VerticalAlignment="Top" Width="75"/>
+        <Button Content="Синхронизировать"
+                Click="Update"
+                HorizontalAlignment="Left" 
+                Margin="5" 
+                Grid.Row="3" 
+                VerticalAlignment="Top" 
+                Width="Auto"/>
         <ScrollViewer VerticalScrollBarVisibility="Auto"
                       HorizontalScrollBarVisibility="Auto"
                       Grid.Row="2"

@@ -24,18 +24,20 @@ namespace plAginF
     {
         Room[] allRooms;
         List<Level> allLevels;
-        public UserWindRoom(Room[] rooms, List<Level> levels)
+        Document _doc;
+        public UserWindRoom(Room[] rooms, List<Level> levels, Document doc)
         {
             InitializeComponent();
             allRooms = rooms;
             allLevels = levels;
+            _doc = doc;
             AllRoomsView.ItemsSource = allRooms;
             AllRoomsView.DisplayMemberPath = "Name";
 
         }
         private void SortRoomsInProject(Object sender, EventArgs e)
         {
-            LevelViewWind levelWind = new LevelViewWind(allLevels, allRooms);
+            LevelViewWind levelWind = new LevelViewWind(allLevels, allRooms, _doc);
             levelWind.ShowDialog();
             //MessageBox.Show("Всё работает");
         }

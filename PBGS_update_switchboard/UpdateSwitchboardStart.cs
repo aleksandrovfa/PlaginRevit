@@ -20,7 +20,7 @@ namespace PBGS_update_switchboard
             FilteredElementCollector newSheetsFilter = new FilteredElementCollector(doc);
             FilteredElementCollector newViewFilter = new FilteredElementCollector(doc);
 
-            /*получение всех листов ревита в качестве элементо,
+            /*получение всех листов ревита в качестве элементов,
             далее через цикл создается list листов.
             Потом проиходит формирование массива и сортировка с помощью массива
             */
@@ -46,13 +46,7 @@ namespace PBGS_update_switchboard
             }
             View[] аllViewDrawtingArray = аllViewDrawtingList.ToArray();
 
-            //IList<Element> allviews = newFilter.OfCategory(BuiltInCategory.OST_Views).ToElements(); ;
-
-
-
-
             UserControl userControl = new UserControl(allSheetsArray, аllViewDrawtingArray);
-
             userControl.ShowDialog();
             //Console.WriteLine("dsfjlk");
             //Console.WriteLine(sheets);
