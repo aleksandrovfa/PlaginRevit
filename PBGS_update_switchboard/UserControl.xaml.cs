@@ -22,14 +22,12 @@ namespace PBGS_update_switchboard
     public partial class UserControl : Window
     {
         ViewSheet[] allSheets;
+        View[] аllViewDrawting;
 
-        public UserControl(ViewSheet[] allSheetsArray)
+        public UserControl(ViewSheet[] allSheetsArray, View[] аllViewDrawtingArray)
         {
             InitializeComponent();
             allSheets = allSheetsArray;
-            //List<string>checksheet = new List<string>();
-            //CheckBox checksheet = new CheckBox();
-
 
             foreach (ViewSheet sheet in allSheets)
             {
@@ -37,8 +35,17 @@ namespace PBGS_update_switchboard
                 checksheet.Content = (sheet.Title);
                 SheetPanel.Children.Add(checksheet);
             }
-           
 
+            аllViewDrawting = аllViewDrawtingArray;
+
+            foreach (View view in аllViewDrawting)
+            {
+                CheckBox checkview = new CheckBox();
+                checkview.Content = (view.Name);
+                ViewPanel.Children.Add(checkview);
+
+
+            }
         }
     }
 }

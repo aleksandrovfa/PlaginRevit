@@ -17,13 +17,14 @@ namespace PBGS_update_switchboard
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             Document doc = commandData.Application.ActiveUIDocument.Document;
-            FilteredElementCollector newFilter = new FilteredElementCollector(doc);
+            FilteredElementCollector newSheetsFilter = new FilteredElementCollector(doc);
+            FilteredElementCollector newViewFilter = new FilteredElementCollector(doc);
 
             /*получение всех листов ревита в качестве элементо,
             далее через цикл создается list листов.
             Потом проиходит формирование массива и сортировка с помощью массива
             */
-            ICollection<Element> allsheets = newFilter.OfCategory(BuiltInCategory.OST_Sheets).WhereElementIsNotElementType().ToElements();
+            ICollection<Element> allsheets = newSheetsFilter.OfCategory(BuiltInCategory.OST_Sheets).WhereElementIsNotElementType().ToElements();
             List<ViewSheet> аllSheetsList = new List<ViewSheet>();
             foreach (Element sheetEl in allsheets)
             {
@@ -35,20 +36,22 @@ namespace PBGS_update_switchboard
 
             /*получение всех видов и что то бла бла 
             */
-            //views = [];
-            //FilteredElementCollector collector = new FilteredElementCollector(doc).OfCategory(BuiltInCategory.OST_Views);
-            //views = collector.ToElements() as List<Autodesk.Revit.DB.View>;
 
-            FilteredElementCollector viewCollector = new FilteredElementCollector(doc);
-            viewCollector.OfClass(typeof(ViewDrafting));
+            IList<Element> allviewdrawting  = newViewFilter.OfClass(typeof(ViewDrafting)).ToElements();
+            List<View> аllViewDrawtingList = new List<View>();
+            foreach (Element viewEl in allviewdrawting)
+            {
+                View view= viewEl as View;
+                аllViewDrawtingList.Add(view);
+            }
+            View[] аllViewDrawtingArray = аllViewDrawtingList.ToArray();
+
+            //IList<Element> allviews = newFilter.OfCategory(BuiltInCategory.OST_Views).ToElements(); ;
 
 
-            IList<Element> allviews = newFilter.OfCategory(BuiltInCategory.OST_Views).ToElements(); ;
 
 
-
-
-            UserControl userControl = new UserControl(allSheetsArray);
+            UserControl userControl = new UserControl(allSheetsArray, аllViewDrawtingArray);
 
             userControl.ShowDialog();
             //Console.WriteLine("dsfjlk");
