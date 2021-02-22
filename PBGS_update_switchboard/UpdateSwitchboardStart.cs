@@ -14,11 +14,13 @@ namespace PBGS_update_switchboard
     [RegenerationAttribute(RegenerationOption.Manual)]
     public class UpdateSwitchboardStart : IExternalCommand
     {
+
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             Document doc = commandData.Application.ActiveUIDocument.Document;
             FilteredElementCollector newSheetsFilter = new FilteredElementCollector(doc);
             FilteredElementCollector newViewFilter = new FilteredElementCollector(doc);
+            
 
             /*получение всех листов ревита в качестве элементов,
             далее через цикл создается list листов.
@@ -48,6 +50,60 @@ namespace PBGS_update_switchboard
 
             UserControl userControl = new UserControl(allSheetsArray, аllViewDrawtingArray);
             userControl.ShowDialog();
+
+            //Получение названий листов и видов из userControl
+            List<string> allCheckedSheet = new List<string>();
+            allCheckedSheet = userControl.allCheckedSheet;
+            List<string> allCheckedView = new List<string>();
+            allCheckedView = userControl.allCheckedView;
+
+            //Открытие выбранного вида
+            UIDocument activeView = commandData.Application.ActiveUIDocument;
+
+            
+            View mainView = null;
+
+            foreach (Element viewEl in allviewdrawting)
+            {
+                View view = viewEl as View;
+                if (view.Name == allCheckedView[0].ToString())
+                {
+                    
+                    //viewAnot = doc.GetElement(view.GetDependentElements(viewAnotFilter));
+                    mainView = view;
+                    activeView.ActiveView = mainView;
+                }
+                
+            }
+
+            List<AnnotationSymbol> viewAnot = new List<AnnotationSymbol>();
+            
+           // FilteredElementCollector newViewsFilter = new FilteredElementCollector(doc).OfClass(typeof(AnnotationSymbol));
+
+            //ElementFilter viewAnotFilter = new ElementClassFilter(AnnotationSymbol);
+            //ICollection<Element> allviewdrdsfawting = newViewsFilter.OfClass(typeof(AnnotationSymbol));
+
+            foreach (ElementId elid in mainView.GetDependentElements(null).ToList()) 
+            {
+                Element elsymbol = doc.GetElement(elid);
+                if (elsymbol.Name == "Type 1")
+                {
+                AnnotationSymbol symbol = elsymbol as AnnotationSymbol;
+                viewAnot.Add(symbol);
+                foreach (Parameter pr in symbol.ParametersMap)
+                    {
+                        string prname = pr.Definition.;
+                        double pr1 = pr.AsDouble();
+                        string pr2 = pr.AsString();
+                        int pr3 = pr.AsInteger();
+                        string pr4 = pr.AsValueString();
+                    }
+                }
+            }
+            //viewAnot = doc.GetElement(mainView.GetDependentElements(viewAnotFilter).ToList());
+
+
+
             //Console.WriteLine("dsfjlk");
             //Console.WriteLine(sheets);
             //Console.WriteLine("dsfjlk");

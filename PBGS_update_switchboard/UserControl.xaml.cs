@@ -23,6 +23,8 @@ namespace PBGS_update_switchboard
     {
         ViewSheet[] allSheets;
         View[] аllViewDrawting;
+        public List<string> allCheckedView;
+        public List<string> allCheckedSheet;
 
         public UserControl(ViewSheet[] allSheetsArray, View[] аllViewDrawtingArray)
         {
@@ -45,7 +47,36 @@ namespace PBGS_update_switchboard
         }
         private void Update(Object sender, EventArgs e)
         {
-            MessageBox.Show("Всё работает");
+            UIElementCollection comboBoxesSheet = SheetPanel.Children;
+            this.allCheckedSheet = new List<string>();
+            foreach (UIElement element in comboBoxesSheet)
+            {
+                CheckBox checkBox = element as CheckBox;
+                //if ()
+                if (checkBox.IsChecked == true)
+                    allCheckedSheet.Add(checkBox.Content.ToString());
+            }
+
+            UIElementCollection comboBoxesView = ViewPanel.Children;
+            this.allCheckedView = new List<string>();
+            //List<String> allCheckedView = new List<string>();
+            foreach (UIElement element in comboBoxesView)
+            {
+                CheckBox checkBox = element as CheckBox;
+                //if ()
+                if (checkBox.IsChecked == true)
+                    allCheckedView.Add(checkBox.Content.ToString());
+            }
+            
+            if (allCheckedSheet.Count == 0)
+                MessageBox.Show("Не выбрано ни одного листа");
+            else if (allCheckedView.Count == 0)
+                MessageBox.Show("Не выбрано ни одного чертежного вида");
+            else if (allCheckedView.Count > 1)
+                MessageBox.Show("Выбрано больше одного чертежного вида");
+            else this.Close();
         }
+
+
     }
 }
