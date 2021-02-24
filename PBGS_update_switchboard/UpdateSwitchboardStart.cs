@@ -57,58 +57,94 @@ namespace PBGS_update_switchboard
             List<string> allCheckedView = new List<string>();
             allCheckedView = userControl.allCheckedView;
 
-            //Открытие выбранного вида
+            //Открытие выбранного вида и сохрание
             UIDocument activeView = commandData.Application.ActiveUIDocument;
-
-            
             View mainView = null;
-
+            // перебор всех доступных чертежных видов и включение отмеченного у которого совпало название с отмеченным.
             foreach (Element viewEl in allviewdrawting)
             {
                 View view = viewEl as View;
                 if (view.Name == allCheckedView[0].ToString())
                 {
                     
-                    //viewAnot = doc.GetElement(view.GetDependentElements(viewAnotFilter));
                     mainView = view;
                     activeView.ActiveView = mainView;
                 }
                 
             }
 
-            List<AnnotationSymbol> viewAnot = new List<AnnotationSymbol>();
+            /* Считывание всех аннотаций групп и создание главное словаря с аннотациями.
+             * (пиздец блять как сложно, сам в ахуе с этого. А считать сами параметры еще тот пиздец. Решил блять 
+             * обойтись словарем. Потом че нить напишу для сравнения параметров. День нахуй на это потратил, а получилось гавно)
+            */
+            ElementClassFilter filter = new ElementClassFilter(typeof(FamilyInstance));
+            Dictionary<string, AnnotationSymbol> dictAnotMain = new Dictionary<string, AnnotationSymbol>();
             
-           // FilteredElementCollector newViewsFilter = new FilteredElementCollector(doc).OfClass(typeof(AnnotationSymbol));
-
-            //ElementFilter viewAnotFilter = new ElementClassFilter(AnnotationSymbol);
-            //ICollection<Element> allviewdrdsfawting = newViewsFilter.OfClass(typeof(AnnotationSymbol));
-
-            foreach (ElementId elid in mainView.GetDependentElements(null).ToList()) 
+            foreach (ElementId elid in mainView.GetDependentElements(filter).ToList()) 
             {
                 Element elsymbol = doc.GetElement(elid);
-                if (elsymbol.Name == "Type 1")
+                if (elsymbol.Category.Name == "Типовые аннотации")
                 {
-                AnnotationSymbol symbol = elsymbol as AnnotationSymbol;
-                viewAnot.Add(symbol);
-                foreach (Parameter pr in symbol.ParametersMap)
+                    AnnotationSymbol symbol = elsymbol as AnnotationSymbol;
+                    if (symbol.AnnotationSymbolType.FamilyName == "# Reports - Схема - Силовой щит - Данные - ГРЩ" |
+                                symbol.AnnotationSymbolType.FamilyName == "# Reports - Схема - Силовой щит - Данные")
                     {
-                        string prname = pr.Definition.;
-                        double pr1 = pr.AsDouble();
-                        string pr2 = pr.AsString();
-                        int pr3 = pr.AsInteger();
-                        string pr4 = pr.AsValueString();
+                        foreach (Parameter pr in symbol.ParametersMap)
+                        {
+                            if (pr.Definition.Name == "Обозначение")
+                            {
+                                dictAnotMain.Add(pr.AsString(), symbol);
+                            }
+                        }
+
                     }
                 }
             }
-            //viewAnot = doc.GetElement(mainView.GetDependentElements(viewAnotFilter).ToList());
+            Dictionary<string, Dictionary<string, AnnotationSymbol>> dictAnotMinor = 
+                new Dictionary<string,Dictionary<string, AnnotationSymbol>>();
+            foreach (Element sheetEl in allsheets)
+            {
+                ViewSheet sheet = sheetEl as ViewSheet;
+                if (allCheckedSheet.Contains(sheet.Title))
+                {
+                    //dictAnotMinor.Add(sheet.Title, new Dictionary<string, AnnotationSymbol>);
+                    foreach (ElementId elid in sheet.GetDependentElements(filter).ToList())
+                    {
+                        Element elsymbol = doc.GetElement(elid);
+                        if (elsymbol.Category.Name == "Типовые аннотации")
+                        {
+                            AnnotationSymbol symbol = elsymbol as AnnotationSymbol;
+                            if (symbol.AnnotationSymbolType.FamilyName == "# Reports - Схема - Силовой щит - Данные - ГРЩ" |
+                                symbol.AnnotationSymbolType.FamilyName == "# Reports - Схема - Силовой щит - Данные")
+                            {
+                                foreach (Parameter pr in symbol.ParametersMap)
+                                {
+                                    if (pr.Definition.Name == "Обозначение")
+                                    {
+                                        if (dictAnotMinor.Keys.Contains(sheet.Title))
+                                        {
+                                            dictAnotMinor[sheet.Title].Add(pr.AsString(), symbol);
+                                        }
+                                        else
+                                        {
+                                            dictAnotMinor.Add(sheet.Title, new Dictionary<string, AnnotationSymbol> { { pr.AsString(), symbol } });
+                                        }
+                                    }
+                                }
+                            }
 
+                        }
 
+                    }
 
-            //Console.WriteLine("dsfjlk");
-            //Console.WriteLine(sheets);
-            //Console.WriteLine("dsfjlk");
+                }
+
+            }
+            
 
             return Result.Succeeded;
+        
+        
         }
     }
 }
