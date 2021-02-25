@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Text;
 using System.Threading.Tasks;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.UI.Selection;
+using Autodesk.Revit.DB.Structure;
 
 namespace PBGS_update_switchboard
 {
@@ -140,11 +143,43 @@ namespace PBGS_update_switchboard
                 }
 
             }
-            
 
+            UIApplication uiApp = commandData.Application;
+            Selection sel = uiApp.ActiveUIDocument.Selection;
+            foreach (var dictAnotminor in dictAnotMinor)
+            {
+                MessageBox.Show("Идет проверка по листу: "+ dictAnotminor.Key);
+                List<ElementId> ids = new List<ElementId>();
+                Dictionary<string, string> showGroup = new Dictionary<string, string>();                
+                foreach (var dictAnot in dictAnotminor.Value)
+                {
+                    if (!dictAnotMain.Keys.Contains(dictAnot.Key))
+                    {
+                        showGroup.Add(dictAnot.Key, ": не найдена");
+                        ids.Add(dictAnot.Value.Id);                                                       
+                    }
+                    else
+                    {
+                        showGroup.Add(dictAnot.Key, ": всё норм");
+                        //MessageBox.Show("Всё норм найдено");                       
+                    }                    
+                }
+                MessageBox.Show(string.Join(Environment.NewLine, showGroup));
+                if (ids.Count > 0)
+                {
+                    XYZ point = sel.PickPoint("Укажите точку для размещения группы");
+                    Group group = null;
+                    Transaction trans = new Transaction(doc);
+                    trans.Start("Lab");
+                    ICollection<ElementId> ids1 = ids;
+                    group = doc.Create.NewGroup(ids1);
+                    Group group1 = doc.Create.PlaceGroup(point, group.GroupType);
+                    group.UngroupMembers();
+                    group1.UngroupMembers();
+                    trans.Commit();
+                }
+            }
             return Result.Succeeded;
-        
-        
         }
     }
 }
