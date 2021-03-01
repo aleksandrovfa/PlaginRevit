@@ -23,8 +23,9 @@ namespace PBGS_update_switchboard
     {
         ViewSheet[] allSheets;
         View[] аllViewDrawting;
-        public List<string> allCheckedView;
-        public List<string> allCheckedSheet;
+        public List<string> ALLCHEKEDVIEW;
+        public List<string> ALLCHECKEDSHEET;
+        public bool CREATEDCOMMENTS;
 
         public UserControl(ViewSheet[] allSheetsArray, View[] аllViewDrawtingArray)
         {
@@ -48,32 +49,32 @@ namespace PBGS_update_switchboard
         private void Update(Object sender, EventArgs e)
         {
             UIElementCollection comboBoxesSheet = SheetPanel.Children;
-            this.allCheckedSheet = new List<string>();
+            this.ALLCHECKEDSHEET = new List<string>();
             foreach (UIElement element in comboBoxesSheet)
             {
                 CheckBox checkBox = element as CheckBox;
                 //if ()
                 if (checkBox.IsChecked == true)
-                    allCheckedSheet.Add(checkBox.Content.ToString());
+                    ALLCHECKEDSHEET.Add(checkBox.Content.ToString());
             }
 
             UIElementCollection comboBoxesView = ViewPanel.Children;
-            this.allCheckedView = new List<string>();
+            this.ALLCHEKEDVIEW = new List<string>();
             //List<String> allCheckedView = new List<string>();
             foreach (UIElement element in comboBoxesView)
             {
                 CheckBox checkBox = element as CheckBox;
                 //if ()
                 if (checkBox.IsChecked == true)
-                    allCheckedView.Add(checkBox.Content.ToString());
+                    ALLCHEKEDVIEW.Add(checkBox.Content.ToString());
             }
             
-            if (allCheckedSheet.Count == 0)
-                MessageBox.Show("Не выбрано ни одного листа");
-            else if (allCheckedView.Count == 0)
+            if (ALLCHECKEDSHEET.Count == 0)
+                MessageBox.Show("Не выбрано ни одного листа,\nхоть один то надо выбрать.");
+            else if (ALLCHEKEDVIEW.Count == 0)
                 MessageBox.Show("Не выбрано ни одного чертежного вида");
-            else if (allCheckedView.Count > 1)
-                MessageBox.Show("Выбрано больше одного чертежного вида");
+            else if (ALLCHEKEDVIEW.Count > 1)
+                MessageBox.Show("Выбрано больше одного чертежного вида.\nСинхронизации на несколько листов не будет. :)");
             else this.Close();
         }
 

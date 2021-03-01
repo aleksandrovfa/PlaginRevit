@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  
+<AddIn Type ="Command">
+    
+<Assembly>PBGS_update_switchboard.dll</Assembly>
+    
+<ClientId>5878c677-bcdd-4620-873a-7688616d38fe</ClientId>
+    
+<FullClassName>PBGS_update_switchboard.UpdateSwitchboardStart</FullClassName>
+    
+<Text>FA_update_switchboard</Text>
+    
+<VendorId>Aleksandrov Fedor Alekseevich</VendorId>
+       
+<VisibilityMode>AlwaysVisible</VisibilityMode>
+  
+</AddIn>
+</RevitAddIns>

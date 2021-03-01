@@ -56,9 +56,9 @@ namespace PBGS_update_switchboard
 
             //Получение названий листов и видов из userControl
             List<string> allCheckedSheet = new List<string>();
-            allCheckedSheet = userControl.allCheckedSheet;
+            allCheckedSheet = userControl.ALLCHECKEDSHEET;
             List<string> allCheckedView = new List<string>();
-            allCheckedView = userControl.allCheckedView;
+            allCheckedView = userControl.ALLCHEKEDVIEW;
 
             //Открытие выбранного вида и сохрание
             UIDocument activeView = commandData.Application.ActiveUIDocument;
@@ -107,7 +107,7 @@ namespace PBGS_update_switchboard
             
             foreach (var dictAnotminor in dictAnotMinor)
             {
-                MessageBox.Show("Идет проверка по листу: "+ dictAnotminor.Key);
+                MessageBox.Show("Идет проверка по листу: \n"+ dictAnotminor.Key);
                 List<ElementId> ids = new List<ElementId>();
                 Dictionary<string, string> showGroup = new Dictionary<string, string>();
                 Transaction trans = new Transaction(doc);
@@ -140,7 +140,7 @@ namespace PBGS_update_switchboard
                     group = doc.Create.NewGroup(ids1);
                     Group group1 = doc.Create.PlaceGroup(point, group.GroupType);
                     group.UngroupMembers();
-                    group1.UngroupMembers();
+                    //group1.UngroupMembers();
 
                 }
                 trans.Commit();
@@ -158,7 +158,8 @@ namespace PBGS_update_switchboard
                 {
                     AnnotationSymbol symbol = elsymbol as AnnotationSymbol;
                     if (symbol.AnnotationSymbolType.FamilyName == "# Reports - Схема - Силовой щит - Данные - ГРЩ" |
-                                symbol.AnnotationSymbolType.FamilyName == "# Reports - Схема - Силовой щит - Данные")
+                                symbol.AnnotationSymbolType.FamilyName == "# Reports - Схема - Силовой щит - Данные" |
+                                symbol.AnnotationSymbolType.FamilyName == "# Reports - Схема - Силовой щит - Данные - ГРЩ1")
                     {
                         foreach (Parameter pr in symbol.ParametersMap)
                         {
@@ -186,7 +187,8 @@ namespace PBGS_update_switchboard
                 {
                     AnnotationSymbol symbol = elsymbol as AnnotationSymbol;
                     if (symbol.AnnotationSymbolType.FamilyName == "# Reports - Схема - Силовой щит - Данные - ГРЩ" |
-                                symbol.AnnotationSymbolType.FamilyName == "# Reports - Схема - Силовой щит - Данные")
+                                symbol.AnnotationSymbolType.FamilyName == "# Reports - Схема - Силовой щит - Данные"|
+                                symbol.AnnotationSymbolType.FamilyName == "# Reports - Схема - Силовой щит - Данные - ГРЩ1")
                     {
                         foreach (Parameter pr in symbol.ParametersMap)
                         {
@@ -207,7 +209,7 @@ namespace PBGS_update_switchboard
             Dictionary<String, String> change = new Dictionary<String, String>();
             foreach (Parameter parameterА1 in A1.Parameters)
             {
-                if (parameterА1.HasValue & !parameterА1.IsReadOnly)
+                if (parameterА1.HasValue & !parameterА1.IsReadOnly & (parameterА1.Definition.Name != "Высота"))
                 {
                     if (parameterА1.StorageType == StorageType.Integer)
                     {
@@ -235,6 +237,7 @@ namespace PBGS_update_switchboard
                         }
 
                     }
+                
                     if (parameterА1.StorageType == StorageType.Double)
                     {
                         string name1 = parameterА1.Definition.Name;
