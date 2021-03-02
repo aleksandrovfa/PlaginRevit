@@ -107,11 +107,12 @@ namespace PBGS_update_switchboard
             
             foreach (var dictAnotminor in dictAnotMinor)
             {
-                MessageBox.Show("Идет проверка по листу: \n"+ dictAnotminor.Key);
-                List<ElementId> ids = new List<ElementId>();
+                //MessageBox.Show("Идет проверка по листу: \n"+ dictAnotminor.Key,"Проверка");
+                List<ElementId> anotNotFoundInView = new List<ElementId>();
                 Dictionary<string, string> showGroup = new Dictionary<string, string>();
+                Dictionary<string, string> changeAllAnot = new Dictionary<string, string>();
                 Transaction trans = new Transaction(doc);
-                trans.Start("Lab");
+                trans.Start("1");
 
 
                 foreach (var dictAnot in dictAnotminor.Value)
@@ -119,24 +120,27 @@ namespace PBGS_update_switchboard
                     if (!dictAnotMain.Keys.Contains(dictAnot.Key))
                     {
                         showGroup.Add(dictAnot.Key, ": не найдена");
-                        ids.Add(dictAnot.Value.Id);                                                       
+                        anotNotFoundInView.Add(dictAnot.Value.Id);                                                       
                     }
                     else
                     {
-                        Dictionary<string,string> change = CompareAnnotations(dictAnotMain[dictAnot.Key],dictAnot.Value);
-                        if (change.Count > 0) showGroup.Add(dictAnot.Key, ": обновлено");
-                        else showGroup.Add(dictAnot.Key, ": всё норм");
-
-
+                        Dictionary<string, string> changeOneAnot = CompareAnnotations(dictAnotMain[dictAnot.Key],dictAnot.Value);
+                        if (changeOneAnot.Count > 0)
+                        {
+                            showGroup.Add(dictAnot.Key, ": обновлено");
+                            changeAllAnot.Add(dictAnot.Key, string.Join(Environment.NewLine, changeOneAnot));
+                        }
+                        else showGroup.Add(dictAnot.Key, ": всё норм");                        
+                        dictAnotMain.Remove(dictAnot.Key);
                     }                    
                 }
                 
-                MessageBox.Show(string.Join(Environment.NewLine, showGroup));
-                if (ids.Count > 0)
+                MessageBox.Show(dictAnotminor.Key+ "\n" + string.Join(Environment.NewLine, showGroup), "Проверка");
+                if (anotNotFoundInView.Count > 0)
                 {
                     XYZ point = sel.PickPoint("Укажите точку размещения групп щита");
                     Group group = null;
-                    ICollection<ElementId> ids1 = ids;
+                    ICollection<ElementId> ids1 = anotNotFoundInView;
                     group = doc.Create.NewGroup(ids1);
                     Group group1 = doc.Create.PlaceGroup(point, group.GroupType);
                     group.UngroupMembers();
@@ -144,6 +148,37 @@ namespace PBGS_update_switchboard
 
                 }
                 trans.Commit();
+
+                if (userControl.CreateComments.IsChecked == true & changeAllAnot.Count>0)
+                {
+                    trans.Start("2");
+                    XYZ point = sel.PickPoint("Укажите точку примечаний изменения");
+                    ElementId defaultTypeId = doc.GetDefaultElementTypeId(ElementTypeGroup.TextNoteType);
+                    TextNote note = TextNote.Create(doc, mainView.Id, point, 
+                        string.Join(Environment.NewLine, changeAllAnot), defaultTypeId);
+                    trans.Commit();
+                }
+            }
+            if (userControl.DelAnnotanion.IsChecked == true)
+            {
+                List<string> notFoundAnotName = new List<string>();
+                List<ElementId> notFoundAnotid = new List<ElementId>();
+                foreach (var row in dictAnotMain)
+                {
+                    notFoundAnotName.Add(row.Key);
+                    notFoundAnotid.Add(row.Value.Id);
+                } 
+                var result = MessageBox.Show("Следующие группы не найдены на листах: \n" + 
+                    String.Join(", ", notFoundAnotName.ToArray()), "Удалить группы?", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    MessageBox.Show("Епта удалил элементы");
+                    Transaction trans = new Transaction(doc);
+                    trans.Start("2");
+                    ICollection<ElementId> el = notFoundAnotid;
+                    doc.Delete(el);
+                    trans.Commit();
+                }
             }
             return Result.Succeeded;
         }

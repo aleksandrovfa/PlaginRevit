@@ -25,7 +25,6 @@ namespace PBGS_update_switchboard
         View[] аllViewDrawting;
         public List<string> ALLCHEKEDVIEW;
         public List<string> ALLCHECKEDSHEET;
-        public bool CREATEDCOMMENTS;
 
         public UserControl(ViewSheet[] allSheetsArray, View[] аllViewDrawtingArray)
         {
@@ -53,22 +52,19 @@ namespace PBGS_update_switchboard
             foreach (UIElement element in comboBoxesSheet)
             {
                 CheckBox checkBox = element as CheckBox;
-                //if ()
                 if (checkBox.IsChecked == true)
                     ALLCHECKEDSHEET.Add(checkBox.Content.ToString());
             }
 
             UIElementCollection comboBoxesView = ViewPanel.Children;
             this.ALLCHEKEDVIEW = new List<string>();
-            //List<String> allCheckedView = new List<string>();
             foreach (UIElement element in comboBoxesView)
             {
                 CheckBox checkBox = element as CheckBox;
-                //if ()
                 if (checkBox.IsChecked == true)
                     ALLCHEKEDVIEW.Add(checkBox.Content.ToString());
             }
-            
+
             if (ALLCHECKEDSHEET.Count == 0)
                 MessageBox.Show("Не выбрано ни одного листа,\nхоть один то надо выбрать.");
             else if (ALLCHEKEDVIEW.Count == 0)
