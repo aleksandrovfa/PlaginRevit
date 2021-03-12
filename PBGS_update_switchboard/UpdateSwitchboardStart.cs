@@ -21,167 +21,185 @@ namespace PBGS_update_switchboard
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             Document doc = commandData.Application.ActiveUIDocument.Document;
-            FilteredElementCollector newSheetsFilter = new FilteredElementCollector(doc);
-            FilteredElementCollector newViewFilter = new FilteredElementCollector(doc);
-            
-
-            /*получение всех листов ревита в качестве элементов,
-            далее через цикл создается list листов.
-            Потом проиходит формирование массива и сортировка с помощью массива
-            */
-            ICollection<Element> allsheets = newSheetsFilter.OfCategory(BuiltInCategory.OST_Sheets).WhereElementIsNotElementType().ToElements();
-            List<ViewSheet> аllSheetsList = new List<ViewSheet>();
-            foreach (Element sheetEl in allsheets)
-            {
-                ViewSheet sheet = sheetEl as ViewSheet;
-                аllSheetsList.Add(sheet);
-            }
-            ViewSheet[] allSheetsArray = аllSheetsList.ToArray();
-            Array.Sort(allSheetsArray, new SheetsComparerByNum());
-
-            /*получение всех видов и что то бла бла 
-            */
-
-            IList<Element> allviewdrawting  = newViewFilter.OfClass(typeof(ViewDrafting)).ToElements();
-            List<View> аllViewDrawtingList = new List<View>();
-            foreach (Element viewEl in allviewdrawting)
-            {
-                View view= viewEl as View;
-                аllViewDrawtingList.Add(view);
-            }
-            View[] аllViewDrawtingArray = аllViewDrawtingList.ToArray();
-
-            UserControl userControl = new UserControl(allSheetsArray, аllViewDrawtingArray);
-            userControl.ShowDialog();
-
-            //Получение названий листов и видов из userControl
-            List<string> allCheckedSheet = new List<string>();
-            allCheckedSheet = userControl.ALLCHECKEDSHEET;
-            List<string> allCheckedView = new List<string>();
-            allCheckedView = userControl.ALLCHEKEDVIEW;
-
-            //Открытие выбранного вида и сохрание
-            UIDocument activeView = commandData.Application.ActiveUIDocument;
-            View mainView = null;
-            // перебор всех доступных чертежных видов и включение отмеченного у которого совпало название с отмеченным.
-            foreach (Element viewEl in allviewdrawting)
-            {
-                View view = viewEl as View;
-                if (view.Name == allCheckedView[0].ToString())
-                {                    
-                    mainView = view;
-                    activeView.ActiveView = mainView;
-                }
-                
-            }
-
-            List<ViewSheet> mainSheets = new List<ViewSheet>();
-            foreach (Element sheetEl in allsheets)
-            {
-                ViewSheet sheet = sheetEl as ViewSheet;
-                if (allCheckedSheet.Contains(sheet.Title))
-                {
-                    mainSheets.Add(sheet);                    
-                }
-
-            }
-
-            /* Считывание всех аннотаций групп и создание главное словаря с аннотациями.
-             * (пиздец блять как сложно, сам в ахуе с этого. А считать сами параметры еще тот пиздец. Решил блять 
-             * обойтись словарем. Потом че нить напишу для сравнения параметров. День нахуй на это потратил, а получилось гавно)
-            */
-            ElementClassFilter filter = new ElementClassFilter(typeof(FamilyInstance));
-
-            Dictionary<string, AnnotationSymbol> dictAnotMain = new Dictionary<string, AnnotationSymbol>();
-            dictAnotMain = GetAnnotationView(mainView, doc);
-          
-            Dictionary<string, Dictionary<string, AnnotationSymbol>> dictAnotMinor = 
-                new Dictionary<string,Dictionary<string, AnnotationSymbol>>();
-            foreach (ViewSheet sheet in mainSheets)
-            {
-                dictAnotMinor.Add(sheet.Title, GetAnnotationSheets(sheet, doc));
-            }
-            //************************************************************************
             UIApplication uiApp = commandData.Application;
-            Selection sel = uiApp.ActiveUIDocument.Selection;
-            
-            foreach (var dictAnotminor in dictAnotMinor)
+            try
             {
-                //MessageBox.Show("Идет проверка по листу: \n"+ dictAnotminor.Key,"Проверка");
-                List<ElementId> anotNotFoundInView = new List<ElementId>();
-                Dictionary<string, string> showGroup = new Dictionary<string, string>();
-                Dictionary<string, string> changeAllAnot = new Dictionary<string, string>();
-                Transaction trans = new Transaction(doc);
-                trans.Start("1");
-
-
-                foreach (var dictAnot in dictAnotminor.Value)
-                {
-                    if (!dictAnotMain.Keys.Contains(dictAnot.Key))
-                    {
-                        showGroup.Add(dictAnot.Key, ": не найдена");
-                        anotNotFoundInView.Add(dictAnot.Value.Id);                                                       
-                    }
-                    else
-                    {
-                        Dictionary<string, string> changeOneAnot = CompareAnnotations(dictAnotMain[dictAnot.Key],dictAnot.Value);
-                        if (changeOneAnot.Count > 0)
-                        {
-                            showGroup.Add(dictAnot.Key, ": обновлено");
-                            changeAllAnot.Add(dictAnot.Key, string.Join(Environment.NewLine, changeOneAnot));
-                        }
-                        else showGroup.Add(dictAnot.Key, ": всё норм");                        
-                        dictAnotMain.Remove(dictAnot.Key);
-                    }                    
-                }
                 
-                MessageBox.Show(dictAnotminor.Key+ "\n" + string.Join(Environment.NewLine, showGroup), "Проверка");
-                if (anotNotFoundInView.Count > 0)
+                FilteredElementCollector newSheetsFilter = new FilteredElementCollector(doc);
+                FilteredElementCollector newViewFilter = new FilteredElementCollector(doc);
+
+
+                /*получение всех листов ревита в качестве элементов,
+                далее через цикл создается list листов.
+                Потом проиходит формирование массива и сортировка с помощью массива
+                */
+                ICollection<Element> allsheets = newSheetsFilter.OfCategory(BuiltInCategory.OST_Sheets).WhereElementIsNotElementType().ToElements();
+                List<ViewSheet> аllSheetsList = new List<ViewSheet>();
+                foreach (Element sheetEl in allsheets)
                 {
-                    XYZ point = sel.PickPoint("Укажите точку размещения групп щита");
-                    Group group = null;
-                    ICollection<ElementId> ids1 = anotNotFoundInView;
-                    group = doc.Create.NewGroup(ids1);
-                    Group group1 = doc.Create.PlaceGroup(point, group.GroupType);
-                    group.UngroupMembers();
-                    //group1.UngroupMembers();
+                    ViewSheet sheet = sheetEl as ViewSheet;
+                    аllSheetsList.Add(sheet);
+                }
+                ViewSheet[] allSheetsArray = аllSheetsList.ToArray();
+                Array.Sort(allSheetsArray, new SheetsComparerByNum());
+
+                /*получение всех видов и что то бла бла 
+                */
+
+                IList<Element> allviewdrawting = newViewFilter.OfClass(typeof(ViewDrafting)).ToElements();
+                List<View> аllViewDrawtingList = new List<View>();
+                foreach (Element viewEl in allviewdrawting)
+                {
+                    View view = viewEl as View;
+                    аllViewDrawtingList.Add(view);
+                }
+                View[] аllViewDrawtingArray = аllViewDrawtingList.ToArray();
+
+                UserControl userControl = new UserControl(allSheetsArray, аllViewDrawtingArray);
+                userControl.ShowDialog();
+
+                //Получение названий листов и видов из userControl
+                List<string> allCheckedSheet = new List<string>();
+                allCheckedSheet = userControl.ALLCHECKEDSHEET;
+                List<string> allCheckedView = new List<string>();
+                allCheckedView = userControl.ALLCHEKEDVIEW;
+
+                //Открытие выбранного вида и сохрание
+                UIDocument activeView = commandData.Application.ActiveUIDocument;
+                View mainView = null;
+                // перебор всех доступных чертежных видов и включение отмеченного у которого совпало название с отмеченным.
+                foreach (Element viewEl in allviewdrawting)
+                {
+                    View view = viewEl as View;
+                    if (view.Name == allCheckedView[0].ToString())
+                    {
+                        mainView = view;
+                        activeView.ActiveView = mainView;
+                    }
 
                 }
-                trans.Commit();
+                // перебор всех доступных листов и добавление в словарь.
+                List<ViewSheet> mainSheets = new List<ViewSheet>();
+                foreach (Element sheetEl in allsheets)
+                {
+                    ViewSheet sheet = sheetEl as ViewSheet;
+                    if (allCheckedSheet.Contains(sheet.Title))
+                    {
+                        mainSheets.Add(sheet);
+                    }
 
-                if (userControl.CreateComments.IsChecked == true & changeAllAnot.Count>0)
-                {
-                    trans.Start("2");
-                    XYZ point = sel.PickPoint("Укажите точку примечаний изменения");
-                    ElementId defaultTypeId = doc.GetDefaultElementTypeId(ElementTypeGroup.TextNoteType);
-                    TextNote note = TextNote.Create(doc, mainView.Id, point, 
-                        string.Join(Environment.NewLine, changeAllAnot), defaultTypeId);
-                    trans.Commit();
                 }
-            }
-            if (userControl.DelAnnotanion.IsChecked == true)
-            {
-                List<string> notFoundAnotName = new List<string>();
-                List<ElementId> notFoundAnotid = new List<ElementId>();
-                foreach (var row in dictAnotMain)
+
+                //* Считывание всех аннотаций групп и создание главного и минорного словаря с аннотациями.
+                //Минорный словарь это словарь словарей, первый ключ - название листа, второй название группы.
+
+                ElementClassFilter filter = new ElementClassFilter(typeof(FamilyInstance));
+
+                Dictionary<string, AnnotationSymbol> dictAnotMain = new Dictionary<string, AnnotationSymbol>();
+                dictAnotMain = GetAnnotationView(mainView, doc);
+
+                Dictionary<string, Dictionary<string, AnnotationSymbol>> dictAnotMinor =
+                    new Dictionary<string, Dictionary<string, AnnotationSymbol>>();
+                foreach (ViewSheet sheet in mainSheets)
                 {
-                    notFoundAnotName.Add(row.Key);
-                    notFoundAnotid.Add(row.Value.Id);
-                } 
-                var result = MessageBox.Show("Следующие группы не найдены на листах: \n" + 
-                    String.Join(", ", notFoundAnotName.ToArray()), "Удалить группы?", MessageBoxButton.YesNo);
-                if (result == MessageBoxResult.Yes)
+                    dictAnotMinor.Add(sheet.Title, GetAnnotationSheets(sheet, doc));
+                }
+                //************************************************************************
+                
+                Selection sel = uiApp.ActiveUIDocument.Selection;
+
+                foreach (var dictAnotminor in dictAnotMinor)
                 {
-                    MessageBox.Show("Епта удалил элементы");
+                    List<ElementId> anotNotFoundInView = new List<ElementId>();
+                    Dictionary<string, string> showGroup = new Dictionary<string, string>();
+                    Dictionary<string, string> changeAllAnot = new Dictionary<string, string>();
                     Transaction trans = new Transaction(doc);
-                    trans.Start("2");
-                    ICollection<ElementId> el = notFoundAnotid;
-                    doc.Delete(el);
+                    trans.Start("1");
+
+
+                    foreach (var dictAnot in dictAnotminor.Value)
+                    {
+                        if (!dictAnotMain.Keys.Contains(dictAnot.Key))
+                        {
+                            showGroup.Add(dictAnot.Key, ": не найдена");
+                            anotNotFoundInView.Add(dictAnot.Value.Id);
+                        }
+                        else
+                        {
+                            Dictionary<string, string> changeOneAnot = 
+                                CompareAnnotations(dictAnotMain[dictAnot.Key], dictAnot.Value);
+                            if (changeOneAnot.Count > 0)
+                            {
+                                showGroup.Add(dictAnot.Key, ": обновлено");
+                                changeAllAnot.Add(dictAnot.Key, string.Join(Environment.NewLine, changeOneAnot));
+                            }
+                            else showGroup.Add(dictAnot.Key, ": всё норм");
+                            dictAnotMain.Remove(dictAnot.Key);
+                        }
+                    }
+
+                    MessageBox.Show(dictAnotminor.Key + "\n" + string.Join(Environment.NewLine, showGroup), "Проверка");
+                    if (anotNotFoundInView.Count > 0)
+                    {
+                        XYZ point = sel.PickPoint("Укажите точку размещения групп щита");
+                        Group group = null;
+                        ICollection<ElementId> ids1 = anotNotFoundInView;
+                        group = doc.Create.NewGroup(ids1);
+                        Group group1 = doc.Create.PlaceGroup(point, group.GroupType);
+                        group.UngroupMembers();
+                        //group1.UngroupMembers();
+
+                    }
                     trans.Commit();
+
+                    if (userControl.CreateComments.IsChecked == true & changeAllAnot.Count > 0)
+                    {
+                        trans.Start("2");
+                        XYZ point = sel.PickPoint("Укажите точку примечаний изменения");
+                        ElementId defaultTypeId = doc.GetDefaultElementTypeId(ElementTypeGroup.TextNoteType);
+                        //string text = string.Join(Environment.NewLine, changeAllAnot.Keys + "\n" + 
+                        //              string.Join(Environment.NewLine, changeAllAnot.Values));
+                        TextNote note = TextNote.Create(doc, mainView.Id, point, 
+                            string.Join(Environment.NewLine, changeAllAnot), defaultTypeId);
+                        trans.Commit();
+                    }
+                }
+                if (userControl.DelAnnotanion.IsChecked == true & dictAnotMain.Count >0)
+                {
+                    List<string> notFoundAnotName = new List<string>();
+                    List<ElementId> notFoundAnotid = new List<ElementId>();
+                    foreach (var row in dictAnotMain)
+                    {
+                        notFoundAnotName.Add(row.Key);
+                        notFoundAnotid.Add(row.Value.Id);
+                    }
+                    var result = MessageBox.Show("Следующие группы не найдены на листах: \n" +
+                        String.Join(", ", notFoundAnotName.ToArray()), "Удалить группы?", MessageBoxButton.YesNo);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        Transaction trans = new Transaction(doc);
+                        trans.Start("2");
+                        ICollection<ElementId> el = notFoundAnotid;
+                        doc.Delete(el);
+                        trans.Commit();
+                    }
                 }
             }
-            return Result.Succeeded;
+            //Обработка исключения при щелчке правой кнопкой или нажатии ESC
+            catch (Autodesk.Revit.Exceptions.OperationCanceledException)
+            {
+                return Result.Cancelled;
+            }
+            //Обработка других ошибок
+            catch (Exception ex)
+            {
+                message = ex.Message;
+                return Result.Failed;
+            }
+        return Result.Succeeded;
         }
+        //ниже две одинаковых функции, одна для view, вторая для viewsheet
+        //на выходе получается словарь с аннтациями, ключами служат названия групп
         private Dictionary<string, AnnotationSymbol> GetAnnotationView(View view, Document doc)
         {
             ElementClassFilter filter = new ElementClassFilter(typeof(FamilyInstance));
@@ -244,7 +262,9 @@ namespace PBGS_update_switchboard
             Dictionary<String, String> change = new Dictionary<String, String>();
             foreach (Parameter parameterА1 in A1.Parameters)
             {
-                if (parameterА1.HasValue & !parameterА1.IsReadOnly & (parameterА1.Definition.Name != "Высота"))
+                if (parameterА1.HasValue & !parameterА1.IsReadOnly 
+                    & (parameterА1.Definition.Name != "Высота")
+                    & (parameterА1.Definition.Name != "Image - Index"))
                 {
                     if (parameterА1.StorageType == StorageType.Integer)
                     {
@@ -254,7 +274,7 @@ namespace PBGS_update_switchboard
                         int value2 = parameterА2[0].AsInteger();
                         if (value1 != value2)
                         {
-                            change.Add(name1, "Изменено значения с " + value1 + " на " + value2);
+                            change.Add(name1, "Изменено  с " + value1 + " на " + value2);
                             parameterА1.Set(value2);
                         }
                     }
